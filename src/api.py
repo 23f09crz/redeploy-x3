@@ -2,9 +2,12 @@ import requests
 import streamlit as st
 import aiohttp
 import asyncio
+import time
 
-from data import load_history, save_history, load_fixture_statistics, save_fixture_statistics
-from variables import live_games_api_url, team_history_api_url, fixture_statistics_api_url, headers
+from data import load_history, save_history, load_fixture_statistics, save_fixture_statistics, load_standings, save_standings
+from variables import live_games_api_url, team_history_api_url, fixture_statistics_api_url, standings_api_url, headers
+
+
 def get_live_games():
     response = requests.get(live_games_api_url, headers=headers)
     if response.status_code == 200:
@@ -14,6 +17,7 @@ def get_live_games():
     else:
         st.error("Erro ao buscar jogos ao vivo")
         return []
+
 
 def get_team_history(team_name, team_id, last_n=20):
     history_data = load_history()
@@ -65,3 +69,31 @@ async def fetch_fixture_statistics(session, fixture_id):
         else:
             print(f"Erro ao buscar estatísticas: {response.status}")
             return fixture_id, []
+
+
+def get_standings(league_id, season):
+    standings_data = load_standings()
+    cache_key = f"{league_id}_{season}"
+
+    if cache_key in standings_data:
+        cached_data = standings_data[cache_key]
+        print(f'Consultando Localmente classificação para liga {league_id}, temporada {season}')
+        return cached_data['data']
+
+    params = {
+        "league": league_id,
+        "season": season
+    }
+    response = requests.get(standings_api_url, headers=headers, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        print(f'Consultando na API classificação para liga {league_id}, temporada {season}')
+        standings_data[cache_key] = {
+            'data': data.get('response', []),
+            'timestamp': int(time.time())
+        }
+        save_standings(standings_data)
+        return data.get('response', [])
+    else:
+        print(f"Erro ao buscar classificação: {response.status_code}")
+        return []
