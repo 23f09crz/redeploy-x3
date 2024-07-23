@@ -4,7 +4,7 @@ import asyncio
 
 # Local Modules
 from data import load_history, remove_old_games_from_history
-from utils import calculate_average_goals, filter_games
+from utils import filter_games
 from api import get_live_games, get_team_history, get_standings
 from views import display_team_history
 
@@ -13,7 +13,6 @@ live_games = filter_games(get_live_games())
 remove_old_games_from_history(history_data)
 
 
-# Add this function to get team position
 def get_team_position(standings, team_id):
     for league in standings:
         for standing in league.get('league', {}).get('standings', []):
@@ -76,11 +75,11 @@ if live_games:
             home_team_history = get_team_history(home_team_name, home_team_id)
             away_team_history = get_team_history(away_team_name, away_team_id)
 
-            home_team_avg_goals = calculate_average_goals(home_team_history, home_team_name)
-            away_team_avg_goals = calculate_average_goals(away_team_history, away_team_name)
-            st.subheader(f"Soma Total das Médias: {round(home_team_avg_goals + away_team_avg_goals, 1)}")
-            st.write(f"Média de Gols {home_team_name}: {home_team_avg_goals}")
-            st.write(f"Média de Gols {away_team_name}: {away_team_avg_goals}")
+            # home_team_avg_goals = calculate_average_goals(home_team_history, home_team_name)
+            # away_team_avg_goals = calculate_average_goals(away_team_history, away_team_name)
+            # st.subheader(f"Soma Total das Médias: {round(home_team_avg_goals + away_team_avg_goals, 1)}")
+            # st.write(f"Média de Gols {home_team_name}: {home_team_avg_goals}")
+            # st.write(f"Média de Gols {away_team_name}: {away_team_avg_goals}")
 
             col1, col2 = st.columns(2)
 
