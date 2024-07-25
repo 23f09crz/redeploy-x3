@@ -3,8 +3,13 @@ from datetime import datetime
 
 from api import get_team_history
 
-
-
+def get_result_emoji(team, home_score, away_score):
+    if home_score > away_score:
+        return "✅" if team == "home" else "❌"
+    elif home_score < away_score:
+        return "❌" if team == "home" else "✅"
+    else:
+        return "⏸"
 
 async def display_team_history(team_id, team_name, limit=10):
     team_history = get_team_history(team_name, team_id)
@@ -24,12 +29,14 @@ async def display_team_history(team_id, team_name, limit=10):
 
         if home_team == team_name:
             color = 'green' if home_score > 0 else 'red'
+            result_emoji = get_result_emoji("home", home_score, away_score)
             st.markdown(
-                f"{date}: <span style='color:{color}'><b>{home_team} {home_score}</b></span> x {away_score} {away_team}",
+                f"{date}: {result_emoji} <span style='color:{color}'><b>{home_team} {home_score}</b></span> x {away_score} {away_team}",
                 unsafe_allow_html=True)
         else:
             color = 'green' if away_score > 0 else 'red'
+            result_emoji = get_result_emoji("away", home_score, away_score)
             st.markdown(
-                f"{date}: {home_team} {home_score} x <span style='color:{color}'><b>{away_team} {away_score}</b></span>",
+                f"{date}: {result_emoji} {home_team} {home_score} x <span style='color:{color}'><b>{away_team} {away_score}</b></span>",
                 unsafe_allow_html=True
             )

@@ -87,12 +87,13 @@ def get_standings(league_id, season):
     response = requests.get(standings_api_url, headers=headers, params=params)
     if response.status_code == 200:
         data = response.json()
+        print(data)
         print(f'Consultando na API classificação para liga {league_id}, temporada {season}')
         standings_data[cache_key] = {
             'data': data.get('response', []),
             'timestamp': int(time.time())
         }
-        save_standings(standings_data)
+        print(standings_data)
         return data.get('response', [])
     else:
         print(f"Erro ao buscar classificação: {response.status_code}")
